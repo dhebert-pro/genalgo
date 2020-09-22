@@ -5,10 +5,17 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse requests of content-type - application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    next();
+});
 
 // Configuring the database
 const dbConfig = require('./config/database.config.js');
@@ -33,6 +40,7 @@ app.get('/', (req, res) => {
 
 // Require Generations routes
 require('./app/routes/generation.routes.js')(app);
+require('./app/routes/generationPool.routes.js')(app);
 
 // listen for requests
 app.listen(3000, () => {
