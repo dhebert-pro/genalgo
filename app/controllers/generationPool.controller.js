@@ -1,3 +1,3 @@
 exports.generate = (req, res) => {
-    res.status(201).send('Tout va bien');
+    res.status(201).send(['Item 1', 'Item 2']);
 };
