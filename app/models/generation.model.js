@@ -8,4 +8,4 @@ const GenerationSchema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Generation', GenerationSchema);
+module.exports = mongoose.model('Generation', GenerationSchema, 'generation');
