@@ -1,23 +1,12 @@
-const Generation = require('../models/generation.model.js');
+const Generation = require('../models/generation.model');
+const GenerationService = require('../services/generation.service')
 
 // Create and Save a new generation
 exports.create = (req, res) => {
-
-    // Create a generation
-    const generation = new Generation({
-        generation: req.body.generation,
-        winning: req.body.winning,
-        losing: req.body.losing
-    });
-
-    // Save generation in the database
-    generation.save()
-    .then(data => {
-        res.send(data);
+    GenerationService.create(req.body).then(data => {
+        res.send(data);   
     }).catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error occurred while creating the generation."
-        });
+        throw err;
     });
 };
 

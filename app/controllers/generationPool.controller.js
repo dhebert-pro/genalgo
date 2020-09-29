@@ -1,3 +1,9 @@
+const GenerationPoolService = require('../services/generationPool.service');
+
 exports.generate = (req, res) => {
-    res.status(201).send(['Item 1', 'Item 2']);
+    GenerationPoolService.generate(req.body).then(data => {
+        res.status(201).send(data);   
+    }).catch(err => {
+        throw err;
+    });
 };

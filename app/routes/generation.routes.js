@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const generations = require('../controllers/generation.controller.js');
+    const generations = require('../controllers/generation.controller');
 
     // Create a new generation
     app.post('/generations', generations.create);
