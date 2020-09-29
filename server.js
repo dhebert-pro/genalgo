@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 
 // Require Generations routes
 require('./app/routes/generation.routes.js')(app);
-require('./app/routes/generationPool.routes.js')(app);
+require('./app/routes/game.routes.js')(app);
 
 // listen for requests
 app.listen(3000, () => {
