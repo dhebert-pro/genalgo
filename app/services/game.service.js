@@ -30,16 +30,16 @@ exports.generate = () => {
                         })
                     ];
                 }
-                Promise.all(promises).then(() => {
+                return Promise.all(promises).then(() => {
                     const { winning, losing } = launchGames(); 
                     GenerationService.create({
                         generation: 1,
                         winning,
                         losing
                     });
+                    return {count: 1};
                 });
             }
-            return {count: 1};
         }
     );
 };
