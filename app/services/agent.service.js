@@ -15,8 +15,6 @@ exports.create = agentParam => {
 
 exports.findByGeneration = generation => {
 
-    Agent.find({ generation })
-    .then(agents => {
-        console.log('Agents', agents);
-    })
+    return Agent.find({ generation });
+    
 }
