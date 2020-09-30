@@ -6,6 +6,9 @@ exports.create = (req, res) => {
     GenerationService.create(req.body).then(data => {
         res.send(data);   
     }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while creating generations."
+        });
         throw err;
     });
 };
@@ -19,6 +22,7 @@ exports.findAll = (req, res) => {
         res.status(500).send({
             message: err.message || "Some error occurred while retrieving generations."
         });
+        throw err;
     });
 };
 
@@ -34,13 +38,14 @@ exports.findOne = (req, res) => {
         res.send(generation);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
-            return res.status(404).send({
+            res.status(404).send({
                 message: "Generation not found with id " + req.params.generationId
             });                
         }
-        return res.status(500).send({
+        res.status(500).send({
             message: "Error retrieving generation with id " + req.params.generationId
         });
+        throw err;
     });
 };
 
@@ -48,7 +53,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     // Validate Request
     if(!req.body.content) {
-        return res.status(400).send({
+        res.status(400).send({
             message: "Generation content can not be empty"
         });
     }
@@ -68,13 +73,14 @@ exports.update = (req, res) => {
         res.send(generation);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
-            return res.status(404).send({
+            res.status(404).send({
                 message: "Generation not found with id " + req.params.generationId
             });                
         }
-        return res.status(500).send({
+        res.status(500).send({
             message: "Error updating generation with id " + req.params.generationId
         });
+        throw err;
     });
 };
 
@@ -83,19 +89,20 @@ exports.delete = (req, res) => {
     Generation.findByIdAndRemove(req.params.generationId)
     .then(generation => {
         if(!generation) {
-            return res.status(404).send({
+            res.status(404).send({
                 message: "Generation not found with id " + req.params.generationId
             });
         }
         res.send({message: "Generation deleted successfully!"});
     }).catch(err => {
         if(err.kind === 'ObjectId' || err.name === 'NotFound') {
-            return res.status(404).send({
+            res.status(404).send({
                 message: "Generation not found with id " + req.params.generationId
             });                
         }
-        return res.status(500).send({
+        res.status(500).send({
             message: "Could not delete generation with id " + req.params.generationId
         });
+        throw err;
     });
 };

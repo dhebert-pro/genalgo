@@ -10,7 +10,5 @@ exports.create = generationParam => {
     return generation.save()
     .then(data => {
         return data;
-    }).catch(err => {
-        throw err.message || "Un problème est survenu lors de la création de la génération.";
     });
 };
