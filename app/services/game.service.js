@@ -13,12 +13,18 @@ const getInformationsFromBoard = board => ([
     board.nbSticks
 ]);
 
-const getBoardFromInformations = informations => ({
-    "nbSticks": informations[0]
-})
+const getBoardFromInformations = informations => {
+    if (informations && informations[0] !== false) {
+        return {
+            "nbSticks": informations[0]
+        };
+    } else {
+        return false;
+    }
+}
 
 const removeSticks = nbSticks => board => {
-    if (board.nbSticks - nbSticks > 0) {
+    if (board.nbSticks - nbSticks >= 0) {
         return {
             ...board,
             "nbSticks": board.nbSticks - nbSticks
@@ -28,9 +34,50 @@ const removeSticks = nbSticks => board => {
     }
 }
 
-const getResultFromInformation = (neuralNetwork, entryValues) => {
-    
+const sigmoid = x => 1 / (1 + Math.exp(-x));
+
+const getNeuronResult = (entryValues, neuron) => {
+    if (entryValues.length !== neuron.weights.length) {
+        throw `Taille d'entrée incorrecte (${entryValues.length} au lieu de ${neuron.weights.length})`;
+    };
+    const weightedNeuron = neuron.bias + entryValues.reduce(
+        (result,element,index) => {
+            return result + element * neuron.weights[index]
+        },
+        0
+    );
+    const result = sigmoid(weightedNeuron);
+
+    return result;
 };
+
+const getResultFromInformation = (neuralNetwork, entryValues) => {
+    const layers = neuralNetwork.neurons;
+    let currentValues = entryValues;
+    layers.forEach(neurons => {
+        let result = [];
+        neurons.forEach(neuron => {
+            neuronResult = getNeuronResult(currentValues, neuron);
+            result = [
+                ...result,
+                neuronResult
+            ];
+        });
+        currentValues = result;
+    });
+    return currentValues;
+};
+
+const getPossibleMoves = board => {
+    let possibleMoves = [removeSticks(1)];
+    if (board.nbSticks > 1) {
+        possibleMoves = [...possibleMoves, removeSticks(2)];
+    };
+    if (board.nbSticks > 2) {
+        possibleMoves = [...possibleMoves, removeSticks(3)];
+    };
+    return possibleMoves;
+}
 
 const launchGame = (agent1, agent2) => {
     const agents = [agent1, agent2];
@@ -41,25 +88,24 @@ const launchGame = (agent1, agent2) => {
     let playingAgent = agents[firstPlayer];
     let otherAgent = agents[1 - firstPlayer];
 
-    const possibleMoves = [removeSticks(1), removeSticks(2), removeSticks(3)];
-
-    let bestScore = Number.NEGATIVE_INFINITY;
-    let bestBoard;
-
     while (board.nbSticks > 0) {
+        let possibleMoves = getPossibleMoves(board);
 
-        const possibleInformations = possibleMoves.filter.map(move => {
-            getInformationsFromBoard(move(board));
+        let bestScore = Number.NEGATIVE_INFINITY;
+        let bestBoard;
+
+        const possibleInformations = possibleMoves.map(move => {
+            return getInformationsFromBoard(move(board));
         });
 
-        possibleInformations.forEach(possibleInformation => {
-            const result = getResultFromInformation(playingAgent, possibleInformation);
+        possibleInformations.filter(x => !!x).forEach(possibleInformation => {
+            const result = getResultFromInformation(playingAgent, possibleInformation)[0];
             if (result > bestScore) {
                 bestScore = result;
                 bestBoard = getBoardFromInformations(possibleInformation);
             }
         });
-        
+
         board = bestBoard;
 
         firstPlayer = 1 - firstPlayer;
@@ -68,8 +114,8 @@ const launchGame = (agent1, agent2) => {
 
     }
     
-    otherAgent.winning = otherAgent.winning + 1;
-    playingAgent.losing = playingAgent.losing + 1;
+    playingAgent.winning = playingAgent.winning + 1;
+    otherAgent.losing = otherAgent.losing + 1;
 
 };
 
@@ -85,10 +131,10 @@ const launchGames = agents => {
 const launch = () => {
     return AgentService.findByGeneration(1).then(agents => {
         let playingAgents = agents.map(agent => ({
-            ...agents,
-            "winning": 0,
-            "losing": 0
-        }))
+                ...agent.toObject(),
+                "winning": 0,
+                "losing": 0
+        }));
 
         let nbIterations = 0;
 
@@ -100,7 +146,7 @@ const launch = () => {
         }
 
         const winner = playingAgents[0];
-
+        console.log('WINNER', JSON.stringify(winner));
         return {
             "winning": winner.winning,
             "losing": winner.losing
@@ -119,9 +165,9 @@ exports.generate = () => {
                             "neurons": [
                             [
                                 {
-                                    "bias": randomInt(20)-10,
+                                    "bias": randomInt(20) - 10,
                                     "weights": [
-                                        randomInt(20)-10
+                                        randomInt(20) - 10
                                     ]
                                 }
                             ]
