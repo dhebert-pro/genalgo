@@ -146,8 +146,8 @@ const launch = () => {
         }
 
         const winner = playingAgents[0];
-        console.log('WINNER', JSON.stringify(winner));
         return {
+            "winner": winner._id,
             "winning": winner.winning,
             "losing": winner.losing
         };
