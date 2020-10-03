@@ -38,7 +38,7 @@ const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 const getNeuronResult = (entryValues, neuron) => {
     if (entryValues.length !== neuron.weights.length) {
-        throw `Taille d'entrée incorrecte (${entryValues.length} au lieu de ${neuron.weights.length})`;
+        throw new Error(`Taille d'entrée incorrecte (${entryValues.length} au lieu de ${neuron.weights.length})`);
     };
     const weightedNeuron = neuron.bias + entryValues.reduce(
         (result,element,index) => {
@@ -151,7 +151,7 @@ const launch = () => {
             "winning": winner.winning,
             "losing": winner.losing
         };
-    });
+    }).catch(err => { throw err; });
 }
 
 exports.generate = () => {
@@ -184,11 +184,11 @@ exports.generate = () => {
                             "losing": agent.losing
                         });
                         return { count: 1 };
-                    }); 
-                });
+                    }).catch(err => { throw err; });
+                }).catch(err => { throw err; });
             } else {
                 return { count: 0 }
             }
         }
-    );
+    ).catch(err => { throw err; });
 };

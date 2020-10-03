@@ -9,7 +9,7 @@ exports.create = (req, res) => {
         res.status(500).send({
             message: err.message || "Some error occurred while creating generations."
         });
-        throw err;
+        console.log(err);
     });
 };
 
@@ -22,7 +22,7 @@ exports.findAll = (req, res) => {
         res.status(500).send({
             message: err.message || "Some error occurred while retrieving generations."
         });
-        throw err;
+        console.log(err);
     });
 };
 
@@ -45,7 +45,7 @@ exports.findOne = (req, res) => {
         res.status(500).send({
             message: "Error retrieving generation with id " + req.params.generationId
         });
-        throw err;
+        console.log(err);
     });
 };
 
@@ -80,7 +80,7 @@ exports.update = (req, res) => {
         res.status(500).send({
             message: "Error updating generation with id " + req.params.generationId
         });
-        throw err;
+        console.log(err);
     });
 };
 
@@ -103,6 +103,6 @@ exports.delete = (req, res) => {
         res.status(500).send({
             message: "Could not delete generation with id " + req.params.generationId
         });
-        throw err;
+        console.log(err);
     });
 };
