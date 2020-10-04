@@ -10,6 +10,8 @@ const AgentSchema = mongoose.Schema({
             }
         ]
     ],
+    'winning': Number,
+    'losing': Number,
     'generation': Number
 });
 
