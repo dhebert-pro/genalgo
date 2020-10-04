@@ -148,7 +148,6 @@ const launch = agents => {
 
     const winner = playingAgents[0];
     return {
-        'winner': winner._id,
         'winning': winner.winning,
         'losing': winner.losing
     };
@@ -184,13 +183,14 @@ exports.generate = () => {
             if (count === 0) {
                 const agents = createRandomAgents();
                 const winner = launch(agents);
-                GenerationService.create({
+                return GenerationService.create({
                     generation: 1,
                     'winner': winner.winner,
                     'winning': winner.winning,
                     'losing': winner.losing
+                }).then(() => {
+                    return { count: 1 };
                 });
-                return { count: 1 };
             } else {
                 return { count: 0 }
             }
