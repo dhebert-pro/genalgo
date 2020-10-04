@@ -2,6 +2,7 @@ const Generation = require('../models/generation.model');
 const AgentService = require('./agent.service');
 const GenerationService = require('./generation.service');
 const randomInt = require('random-int');
+const { v4: uuidv4 } = require('uuid');
 
 const getScore = agent => agent.winning * 3;
 
@@ -16,7 +17,7 @@ const getInformationsFromBoard = board => ([
 const getBoardFromInformations = informations => {
     if (informations && informations[0] !== false) {
         return {
-            "nbSticks": informations[0]
+            'nbSticks': informations[0]
         };
     } else {
         return false;
@@ -27,7 +28,7 @@ const removeSticks = nbSticks => board => {
     if (board.nbSticks - nbSticks >= 0) {
         return {
             ...board,
-            "nbSticks": board.nbSticks - nbSticks
+            'nbSticks': board.nbSticks - nbSticks
         };
     } else {
         return false;
@@ -82,7 +83,7 @@ const getPossibleMoves = board => {
 const launchGame = (agent1, agent2) => {
     const agents = [agent1, agent2];
     let board = {
-        "nbSticks": 20
+        'nbSticks': 20
     };
     let firstPlayer = randomInt(1);
     let playingAgent = agents[firstPlayer];
@@ -120,68 +121,78 @@ const launchGame = (agent1, agent2) => {
 };
 
 const launchGames = agents => {
-    for (let indexAgent = 0; indexAgent < (agents.length - 1) / 2; indexAgent++) {
-        const agent1 = agents[2 * indexAgent];
-        const agent2 = agents[2 * indexAgent + 1];
+    const randomAgents = agents.sort(() => Math.random() - 0.5);
+    for (let indexAgent = 0; indexAgent < (randomAgents.length - 1) / 2; indexAgent++) {
+        const agent1 = randomAgents[2 * indexAgent];
+        const agent2 = randomAgents[2 * indexAgent + 1];
         launchGame(agent1, agent2);
     }
-    return agents;
+    return randomAgents;
 };
 
 const launch = () => {
     return AgentService.findByGeneration(1).then(agents => {
         let playingAgents = agents.map(agent => ({
                 ...agent.toObject(),
-                "winning": 0,
-                "losing": 0
+                'winning': 0,
+                'losing': 0
         }));
 
         let nbIterations = 0;
 
         while (!hasAWinner(playingAgents) || nbIterations < 100) {
-            playingAgents = launchGames(playingAgents).sort((agent1, agent2) => {
-                return getScore(agent2) - getScore(agent1);
-            });
+            playingAgents = launchGames(playingAgents);
             nbIterations++;
         }
 
+        playingAgents = playingAgents.sort((agent1, agent2) => {
+            return getScore(agent2) - getScore(agent1);
+        });
+
         const winner = playingAgents[0];
         return {
-            "winner": winner._id,
-            "winning": winner.winning,
-            "losing": winner.losing
+            'winner': winner._id,
+            'winning': winner.winning,
+            'losing': winner.losing
         };
     }).catch(err => { throw err; });
 }
+
+const createRandomAgents = () => {
+    let promises = [];
+    for(let i=0; i<64; i++) {
+        const name = uuidv4();
+        promises = [...promises,
+            AgentService.create({
+                name,
+                'neurons': [
+                [
+                    {
+                        'bias': randomInt(20) - 10,
+                        'weights': [
+                            randomInt(20) - 10
+                        ]
+                    }
+                ]
+                ],
+                'generation': 1
+            })
+        ];
+    }
+    return promises;
+};
 
 exports.generate = () => {
     return Generation.estimatedDocumentCount().then(
         count => {
             if (count === 0) {
-                let promises = [];
-                for(let i=0; i<64; i++) {
-                    promises = [...promises,
-                        AgentService.create({
-                            "neurons": [
-                            [
-                                {
-                                    "bias": randomInt(20) - 10,
-                                    "weights": [
-                                        randomInt(20) - 10
-                                    ]
-                                }
-                            ]
-                            ],
-                            "generation": 1
-                        })
-                    ];
-                }
+                const promises = createRandomAgents();
                 return Promise.all(promises).then(() => {
                     return launch().then(agent => {
                         GenerationService.create({
                             generation: 1,
-                            "winning": agent.winning,
-                            "losing": agent.losing
+                            'winning': agent.winning,
+                            'losing': agent.losing
                         });
                         return { count: 1 };
                     }).catch(err => { throw err; });

@@ -1,25 +1,16 @@
 const mongoose = require('mongoose');
 
 const AgentSchema = mongoose.Schema({
-    "neurons": {
-        "type": [
-            [
-                {
-                    "bias": {
-                        "type": "Number"
-                    },
-                    "weights": {
-                        "type": [
-                            "Number"
-                        ]
-                    }
-                }
-            ]
+    'name': String,
+    'neurons': [
+        [
+            {
+                'bias': Number,
+                'weights': [Number]
+            }
         ]
-    },
-    "generation": {
-        "type": "Number"
-    }
+    ],
+    'generation': Number
 });
 
 module.exports = mongoose.model('Agent', AgentSchema, 'agent');
