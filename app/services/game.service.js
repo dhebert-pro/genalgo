@@ -38,7 +38,7 @@ const removeSticks = nbSticks => board => {
 const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 const getNeuronResult = (entryValues, neuron) => {
-    if (entryValues.length !== neuron.weights.length) {
+    if (entryValues.length === neuron.weights.length) {
         throw new Error(`Taille d'entrée incorrecte (${entryValues.length} au lieu de ${neuron.weights.length})`);
     };
     const weightedNeuron = neuron.bias + entryValues.reduce(
