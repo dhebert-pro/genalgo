@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 
 const GenerationSchema = mongoose.Schema({
-    'generation': Number,
-    'winning': Number,
-    'losing': Number
+    'generation': Number
 }, {
     timestamps: true
 });

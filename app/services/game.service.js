@@ -185,9 +185,7 @@ exports.generate = () => {
                 const winner = launch(agents);
                 return GenerationService.create({
                     generation: 1,
-                    'winner': winner.winner,
-                    'winning': winner.winning,
-                    'losing': winner.losing
+                    'winner': winner.winner
                 }).then(() => {
                     return { count: 1 };
                 });

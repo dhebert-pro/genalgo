@@ -1,4 +1,3 @@
-const Generation = require('../models/generation.model');
 const GenerationService = require('../services/generation.service')
 
 exports.create = (req, res) => {
@@ -13,7 +12,7 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-    Generation.find()
+    GenerationService.find(req.query.filter)
     .then(generations => {
         res.send(generations);
     }).catch(err => {
