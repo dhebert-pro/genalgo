@@ -23,3 +23,15 @@ exports.findAll = (req, res) => {
         console.log(err);
     });
 };
+
+exports.deleteAll = (req, res) => {
+    Agent.deleteMany({})
+    .then(() => {
+        res.status(204).end();
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Erreur lors de la suppression des agents."
+        });
+        console.log(err);
+    });
+};

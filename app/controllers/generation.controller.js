@@ -1,4 +1,5 @@
-const GenerationService = require('../services/generation.service')
+const Generation = require('../models/generation.model');
+const GenerationService = require('../services/generation.service');
 
 exports.create = (req, res) => {
     GenerationService.create(req.body).then(data => {
@@ -18,6 +19,18 @@ exports.findAll = (req, res) => {
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Erreur lors de la récupération des générations."
+        });
+        console.log(err);
+    });
+};
+
+exports.deleteAll = (req, res) => {
+    Generation.deleteMany({})
+    .then(() => {
+        res.status(204).end();
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Erreur lors de la suppression des générations."
         });
         console.log(err);
     });
