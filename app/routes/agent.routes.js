@@ -4,5 +4,6 @@ module.exports = (app) => {
     app.post('/agents', agents.create);
     app.get('/agents', agents.findAll);
     app.delete('/agents', agents.deleteAll);
+    app.get('/agents/:agentId', agents.findOne);
 
 }

@@ -6,7 +6,7 @@ exports.create = (req, res) => {
         res.status(201).send(data);
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Erreur lors de la création de l'agent."
+            message: err.message || "Erreur lors de la création de l'agent"
         });
         console.log(err);
     });
@@ -18,7 +18,25 @@ exports.findAll = (req, res) => {
         res.send(agents);
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Erreur lors de la récupération des agents."
+            message: err.message || "Erreur lors de la récupération des agents"
+        });
+        console.log(err);
+    });
+};
+
+exports.findOne = (req, res) => {
+    Agent.findById(req.params.agentId)
+    .then(agent => {
+        if (!agent) {
+            res.status(404).send({
+                message: "Aucun agent avec l'id spécifié n'a été trouvé dans la base"
+            })
+        } else {
+            res.send(agent);
+        }
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Erreur lors de la récupération des agents"
         });
         console.log(err);
     });

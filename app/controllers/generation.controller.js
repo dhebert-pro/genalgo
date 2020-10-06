@@ -6,7 +6,7 @@ exports.create = (req, res) => {
         res.status(201).send(data);
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Erreur lors de la création de la génération."
+            message: err.message || "Erreur lors de la création de la génération"
         });
         console.log(err);
     });
@@ -18,7 +18,7 @@ exports.findAll = (req, res) => {
         res.send(generations);
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Erreur lors de la récupération des générations."
+            message: err.message || "Erreur lors de la récupération des générations"
         });
         console.log(err);
     });
@@ -30,7 +30,7 @@ exports.deleteAll = (req, res) => {
         res.status(204).end();
     }).catch(err => {
         res.status(500).send({
-            message: err.message || "Erreur lors de la suppression des générations."
+            message: err.message || "Erreur lors de la suppression des générations"
         });
         console.log(err);
     });

@@ -5,7 +5,7 @@ exports.generate = (req, res) => {
         res.status(201).send(data);   
     }).catch(err => {
         res.status(500).send({
-            message: err.message || 'Erreur lors de la génération.'
+            message: err.message || 'Erreur lors de la génération'
         });
         console.log(err);
     });
