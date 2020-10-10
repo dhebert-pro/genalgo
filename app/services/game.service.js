@@ -187,7 +187,7 @@ exports.generate = () => {
                     });
                 });
             } else {
-                return { count: 0 }
+                return { count: 0 };
             }
         }
     ).catch(err => { throw err; });
