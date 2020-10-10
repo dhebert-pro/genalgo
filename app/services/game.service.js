@@ -28,16 +28,6 @@ const getInformationsFromBoard = board => ([
     board.nbSticks
 ]);
 
-const getBoardFromInformations = informations => {
-    if (informations && informations[0] !== false) {
-        return {
-            'nbSticks': informations[0]
-        };
-    } else {
-        return false;
-    }
-}
-
 const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 const getNeuronResult = (entryValues, neuron) => {
@@ -76,33 +66,19 @@ const getPossibleMoves = (moves, board) => {
     return moves.filter(move => {
         const nbSticks = move.params[0];
         return (move.name === REMOVE_STICKS && board.nbSticks >= nbSticks);
-    }).map(move => {
-        return gameFunctions[move.name](move.params[0]);
     });
 }
 
+const applyMove = (move, board) => {
+    return gameFunctions[move.name](move.params[0])(board);
+};
+
 const playMove = (moves, agents, board, activePlayer) => {
+
     const playingAgent = agents[activePlayer];
-    const possibleMoves = getPossibleMoves(moves, board);
 
-    if (possibleMoves.length === 0) {
-        throw new Error('Aucun coup n\'est possible');
-    }
-
-    let bestScore = Number.NEGATIVE_INFINITY;
-    let bestBoard;
-
-    const possibleInformations = possibleMoves.map(move => {
-        return getInformationsFromBoard(move(board));
-    });
-
-    possibleInformations.filter(x => !!x).forEach(possibleInformation => {
-        const result = getResultFromInformation(playingAgent, possibleInformation)[0];
-        if (result > bestScore) {
-            bestScore = result;
-            bestBoard = getBoardFromInformations(possibleInformation);
-        }
-    });
+    const bestMove = this.getBestMove(moves, playingAgent, board);
+    const bestBoard = applyMove(bestMove, board);
 
     if (bestBoard.nbSticks === 0) {
         return activePlayer;
@@ -191,6 +167,12 @@ const createRandomAgents = () => {
     return agents;
 };
 
+exports.getBoardFromInformations = informations => {
+    return {
+        'nbSticks': informations[0]
+    };
+}
+
 exports.generate = () => {
     return Generation.estimatedDocumentCount().then(
         count => {
@@ -209,4 +191,28 @@ exports.generate = () => {
             }
         }
     ).catch(err => { throw err; });
+};
+
+exports.getBestMove = (moves, agent, board) => {
+    const possibleMoves = getPossibleMoves(moves, board);
+
+    if (possibleMoves.length === 0) {
+        throw new Error('Aucun coup n\'est possible');
+    }
+
+    let bestScore = Number.NEGATIVE_INFINITY;
+    let bestMove;
+
+    possibleMoves.forEach(possibleMove => {
+        const newBoard = applyMove(possibleMove, board);
+        const possibleInformation = getInformationsFromBoard(newBoard);
+        const result = getResultFromInformation(agent, possibleInformation)[0];
+        if (result > bestScore) {
+            bestScore = result;
+            bestMove = possibleMove;
+        }
+    });
+
+    return bestMove;
+
 };

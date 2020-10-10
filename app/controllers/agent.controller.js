@@ -25,7 +25,7 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
-    Agent.findById(req.params.agentId)
+    AgentService.findById(req.params.agentId)
     .then(agent => {
         if (!agent) {
             res.status(404).send({

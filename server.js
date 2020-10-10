@@ -43,6 +43,7 @@ app.get('/', (req, res) => {
 require('./app/routes/generation.routes.js')(app);
 require('./app/routes/game.routes.js')(app);
 require('./app/routes/agent.routes.js')(app);
+require('./app/routes/move.routes.js')(app);
 
 // listen for requests
 app.listen(3000, () => {
