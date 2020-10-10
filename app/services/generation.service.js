@@ -14,15 +14,19 @@ exports.create = generationParam => {
     });
 };
 
+exports.findLatest = () => {
+    return Generation.find().sort({'generation': -1}).limit(1);
+};
+
 exports.find = filter => {
     return Generation.find().lean()
     .then(generations => {
         let promises = [];
         if (filter === FILTER_WITH_WINNER) {
             promises = generations.map(generation => {
-                return AgentService.findGenerationWinner(generation.generation).then(winner => {
+                return AgentService.findGenerationWinner(generation.generation).then(winners => {
                     return {...generation, 
-                        'winner': winner[0]
+                        'winner': winners[0]
                     };
                 });
             });

@@ -1,4 +1,5 @@
 const Generation = require('../models/generation.model');
+const Agent = require('../models/agent.model');
 const AgentService = require('./agent.service');
 const MoveService = require('./move.service');
 const GenerationService = require('./generation.service');
@@ -136,10 +137,14 @@ const launch = agents => {
         });
 
         const winner = playingAgents[0];
-        return {
-            'winning': winner.winning,
-            'losing': winner.losing
-        };
+        if (winner) {
+            return {
+                'winning': winner.winning,
+                'losing': winner.losing
+            };
+        } else {
+            return {};
+        }
     });
 };
 
@@ -167,6 +172,47 @@ const createRandomAgents = () => {
     return agents;
 };
 
+const trainAgents = (agents, generation) => {
+    launch(agents).then(winner => {
+        GenerationService.create({
+            generation,
+            'winner': winner.winner
+        })
+    });
+};
+
+const launchFirstGeneration = () => {
+    const agents = createRandomAgents();
+    trainAgents(agents, 1);
+};
+
+const crossAgents = (agents, generation) => {
+    return agents.map(agent => {
+        return {
+            ...agent, 
+            _id: undefined,
+            generation
+        }
+    });
+};
+
+const getLatestGenerationNum = () => {
+    return GenerationService.findLatest().then(generations => {
+        const previousGeneration = generations[0].generation;
+        return previousGeneration;
+    })
+};
+
+const launchNextGeneration = () => {
+    getLatestGenerationNum().then(generation => {
+        const previousAgents = AgentService.findByGeneration(generation);
+        previousAgents.then(previousAgents => {
+            const nextAgents = crossAgents(previousAgents, generation + 1);
+            trainAgents(nextAgents, generation + 1);
+        });
+    });
+};
+
 exports.getBoardFromInformations = informations => {
     return {
         'nbSticks': informations[0]
@@ -177,13 +223,9 @@ exports.generate = () => {
     return Generation.estimatedDocumentCount().then(
         count => {
             if (count === 0) {
-                const agents = createRandomAgents();
-                launch(agents).then(winner => {
-                    GenerationService.create({
-                        generation: 1,
-                        'winner': winner.winner
-                    })
-                });
+                launchFirstGeneration();
+            } else {
+                launchNextGeneration();
             }
         }
     );
