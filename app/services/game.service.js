@@ -178,19 +178,15 @@ exports.generate = () => {
         count => {
             if (count === 0) {
                 const agents = createRandomAgents();
-                return launch(agents).then(winner => {
-                    return GenerationService.create({
+                launch(agents).then(winner => {
+                    GenerationService.create({
                         generation: 1,
                         'winner': winner.winner
-                    }).then(() => {
-                        return { count: 1 };
-                    });
+                    })
                 });
-            } else {
-                return { count: 0 };
             }
         }
-    ).catch(err => { throw err; });
+    );
 };
 
 exports.getBestMove = (moves, agent, board) => {
